@@ -13,3 +13,5 @@ release.properties
 ##Logs##
 *.log
 *.log.*
+
+refresh.bat
