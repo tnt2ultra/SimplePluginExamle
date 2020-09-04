@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javafx.application.Application;
@@ -26,7 +27,7 @@ public class MainApplication extends Application {
 	ArrayList<String> classes = new ArrayList<>();
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
+	public void start(Stage primaryStage) throws MalformedURLException, IOException {
 		if (getJarFiles()) {
 			fillUrls();
 			URLClassLoader urlClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
@@ -94,17 +95,20 @@ public class MainApplication extends Application {
 	}
 
 	private void fillClasses(JarFile jar) {
-		jar.stream().forEach(jarEntry -> {
-			if (jarEntry.getName().endsWith(".class")) {
-				classes.add(jarEntry.getName());
-			}
-		});
+		jar.stream().forEach(jarEntry -> addClass(jarEntry));
+	}
+
+	private void addClass(JarEntry jarEntry) {
+		if (jarEntry.getName().endsWith(".class")) {
+			classes.add(jarEntry.getName());
+		}
 	}
 
 	private boolean getJarFiles() {
 		File pluginDirectory = new File("plugins");
-		if (!pluginDirectory.exists())
+		if (!pluginDirectory.exists()) {
 			pluginDirectory.mkdir();
+		}
 		files = pluginDirectory.listFiles((dir, name) -> name.endsWith(".jar"));
 		return files != null && files.length > 0;
 	}
